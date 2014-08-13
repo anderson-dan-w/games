@@ -18,52 +18,6 @@ class Arrow(QPushButton):
         self.setFixedWidth(18)
         self.clicked.connect(self.world.move)
 
-class OldWorld(object):
-    ME = 'i'
-
-    def __init__(self, rows=10, cols=10):
-        self.MAX_X = cols
-        self.MAX_Y = rows
-        self.true_world = [['.'  ] * self.MAX_X for i in range(self.MAX_Y)]
-        self.seen_world = [[False] * self.MAX_X for i in range(self.MAX_Y)]
-        ## dealing with ME and sight
-        self.nsight = 2 ## default
-        self.x, self.y = int(self.MAX_X/2), int(self.MAX_Y/2)
-        self.seen_world[self.y][self.x] = True ## we can see ourselves
-        self._add_visible()  ## fill in initial view
-
-    def _add_visible(self):
-        """ POST-move, add any new spots. A bit redundant, but much easier to
-            program this way...
-        """
-        dist = self.nsight - 1
-        for dir_x, dir_y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-            edge_x = self.x + (dir_x * dist)
-            edge_y = self.y + (dir_y * dist)
-            for x, y in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
-                nx = (edge_x + x) % self.MAX_X
-                ny = (edge_y + y) % self.MAX_Y
-                self.seen_world[ny][nx] = True
-
-    def move(self, x, y):
-        self.x = (self.x + x) % self.MAX_X
-        self.y = (self.y + y) % self.MAX_Y
-        self._add_visible()
-
-    def get_ascii_world(self):
-        s = ""
-        for ridx in range(self.MAX_Y):
-            for cidx in range(self.MAX_X):
-                ##@TODO: ok, this obviously needs to change, eventually...
-                if (self.x, self.y) == (cidx, ridx):
-                    s += "<b>{}</b>".format(self.ME)
-                elif self.seen_world[ridx][cidx]:
-                    s += "<span style='color:#808080'>{}</span>".format(self.true_world[ridx][cidx])
-                else:
-                    s += '&nbsp;'
-            s += "<br >"
-        return s
-
 class WorldQt(QWidget):
     def __init__(self, rows=10, cols=10):
         ## first, super it
